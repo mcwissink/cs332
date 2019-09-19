@@ -1,5 +1,9 @@
+/**
+ * BitHandler
+ * A client for the SocketSystem server
+ */
 public class BitHandler extends Thread {
-    public static final int HALFPERIOD = 500;
+    public static final int HALFPERIOD = 100;
 
     private static final String SILENCE = "SILENCE";
     private static final String EXPECT_ZERO = "EXPECT_ZERO";
@@ -12,15 +16,27 @@ public class BitHandler extends Thread {
     private BitListener listener;
     private String state = SILENCE;
 
+    /**
+     * Default constructor that uses the DEFAULT PORT value from the LightSystem
+     */
     public BitHandler() {
 	this("localhost", LightSystem.DEFAULT_PORT);
     }
 
+    /**
+     * Constructor that sets up the client
+     * @param host the host server
+     * @param port the port that the server is listening on
+     */
     public BitHandler(String host, int port) {
 	panel = new LightPanel(host, port);
 	start();
     }
 
+    /**
+     * Stop execution of the thread
+     * @param milliseconds the amount of time to stop for
+     */
     public static void pause(int milliseconds) {
 	try {
 	    Thread.sleep(milliseconds);
@@ -32,25 +48,39 @@ public class BitHandler extends Thread {
     }
 
     /**
+     * Check for a collision
+     * @param if the light should be on
+     */
+    private void checkCollision(boolean on) throws CollisionException {
+	if ((on && !panel.isOn()) || (!on && panel.isOn())) {
+	    throw new CollisionException();
+	}
+    }
+
+    /**
      * Turn the light system on (if it isn't already), then wait half a period. Then
      * turn the light off, for half a period.
      */
-    public void broadcastZero() {
+    public void broadcastZero() throws CollisionException {
 	panel.switchOn();
 	pause(HALFPERIOD);
+	checkCollision(true);
 	panel.switchOff();
 	pause(HALFPERIOD);
+	checkCollision(false);
     }
 
     /**
      * Turn the light system off (if it isn't already), then wait half a period.
      * Then turn the light on, for half a period.
      */
-    public void broadcastOne() {
+    public void broadcastOne() throws CollisionException {
 	panel.switchOff();
 	pause(HALFPERIOD);
+	checkCollision(false);
 	panel.switchOn();
 	pause(HALFPERIOD);
+	checkCollision(true);
     }
 
     /**
@@ -58,15 +88,13 @@ public class BitHandler extends Thread {
      * Build up a string of successfully sent bits (called "broadcasted"). Switch
      * the light off when done.
      */
-    public void broadcast(String bits) {
+    public void broadcast(String bits) throws CollisionException {
 	for (char bit: bits.toCharArray()) {
 	    switch(bit) {
 	    case '0':
-		System.out.println("zero");
 		broadcastZero();
 		break;
 	    case '1':
-		System.out.println("one");
 		broadcastOne();
 		break;
 	    }
@@ -103,7 +131,7 @@ public class BitHandler extends Thread {
 			state = SILENCE;
 		    } else if (state.equals(EXPECT_ONE)) {
 			state = EXPECT_ZERO;
-			// notifyReceived(bits);
+			notifyReceived(bits);
 			bits = "";
 		    } else if (state.equals(HALF_ZERO)) {
 			bits += "0";
@@ -146,11 +174,11 @@ public class BitHandler extends Thread {
 
 		if (state.equals(EXPECT_ONE)) {
 		    state = SILENCE;
-		    // notifyReceived(bits);
+		    notifyReceived(bits);
 		    bits = "";
 		} else if (state.equals(HALF_ZERO)) {
 		    state = SILENCE;
-		    // notifyReceived(bits + "0");
+		    notifyReceived(bits + "0");
 		    bits = "";
 		} else if (state.equals(HALF_ONE)) {
 		    bits = "";
@@ -166,14 +194,24 @@ public class BitHandler extends Thread {
 	}
     }
 
+    /**
+     * Set a BitListener
+     * @param l a BitListener
+     */
     public void setListener(BitListener l) {
 	listener = l;
     }
 
+    /**
+     * @return is the state machine in silent state
+     */
     public boolean isSilent() {
 	return state.equals(SILENCE);
     }
-
+    
+    /**
+     * @return handler id
+     */
     public int getID() {
 	return panel.getID();
     }

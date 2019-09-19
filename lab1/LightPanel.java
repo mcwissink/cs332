@@ -45,12 +45,15 @@ public class LightPanel extends Thread {
     }
 
     /**
-     * 
+     * Send out an "on" command to the socket system
      */
     public void switchOn() {
 	socketOut.println(LightSystem.HIGH);
     }
 
+    /**
+     * Send out an "off" command to the socket system
+     */
     public void switchOff() {
 	socketOut.println(LightSystem.LOW);
     }
@@ -87,14 +90,23 @@ public class LightPanel extends Thread {
 	}
     }
 
+    /**
+     * @return is the light on
+     */
     public boolean isOn() {
 	return isHigh;
     }
 
+    /**
+     * @return a string of the panel id
+     */
     public String toString() {
 	return "#" + id;
     }
 
+    /**
+     * @return panel id
+     */
     public int getID() {
 	return id;
     }
