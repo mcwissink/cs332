@@ -1,11 +1,19 @@
 import java.awt.event.*;
 import javax.swing.*;
 
+/**
+ * BitDisplay
+ * A display for a BitHandler
+ */
 public class BitDisplay implements ActionListener, BitListener {
     private BitHandler handler;
     private JTextField receiveField;
     private JTextField sendField;
 
+    /**
+     * Constructor that connecst a handler to the display
+     * @param handler a BitHandler to display
+     */
     public BitDisplay(BitHandler handler) {
 	this.handler = handler;
 
@@ -25,6 +33,10 @@ public class BitDisplay implements ActionListener, BitListener {
 	handler.setListener(this);
     }
 
+    /**
+     * ActionListener for the sendField. Broadcast the sendField text
+     * @param e
+     */
     public void actionPerformed(ActionEvent e) {
 	new Thread() {
 	    public void run() {
@@ -39,6 +51,11 @@ public class BitDisplay implements ActionListener, BitListener {
 	sendField.selectAll();
     }
 
+    /**
+     * BitListener implementation 
+     * @param h unused
+     * @param bits the bit values that have been received
+     */
     public void bitsReceived(BitHandler h, String bits) {
 	receiveField.setText(bits);
     }

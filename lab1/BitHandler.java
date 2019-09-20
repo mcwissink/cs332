@@ -3,7 +3,7 @@
  * A client for the SocketSystem server
  */
 public class BitHandler extends Thread {
-    public static final int HALFPERIOD = 100;
+    public static final int HALFPERIOD = 500;
 
     private static final String SILENCE = "SILENCE";
     private static final String EXPECT_ZERO = "EXPECT_ZERO";
@@ -101,6 +101,9 @@ public class BitHandler extends Thread {
 	}
     }
 
+    /**
+     * @return the panel string
+     */
     public String toString() {
 	return panel.toString();
     }
@@ -216,6 +219,10 @@ public class BitHandler extends Thread {
 	return panel.getID();
     }
 
+    /**
+     * Update the listener with the new bits
+     * @param bits the values received from the LightPanel
+     */
     private void notifyReceived(final String bits) {
 	if (listener == null)
 	    return;
