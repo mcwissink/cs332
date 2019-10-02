@@ -1,14 +1,14 @@
 import java.awt.event.*;
 import javax.swing.*;
 
-public class Layer2Display implements ActionListener, Layer2Listener
+public class L2Display implements ActionListener, L2Listener
 {
-    private Layer2Handler handler;
+    private L2Handler handler;
     private JTextField displayField;
     private JTextField addressField;
     private JTextField payloadField;
 
-    public Layer2Display(Layer2Handler handler)
+    public L2Display(L2Handler handler)
     {
 	this.handler = handler;
 	handler.setListener(this);
