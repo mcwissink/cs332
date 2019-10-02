@@ -24,7 +24,7 @@ public class L2Frame {
     }
 
     static int computeErrorCheck(String bits) {
-	int bitTotal = 0
+	int bitTotal = 0;
 	char[] bitChars = bits.toCharArray();
 	for (char bit: bitChars) {
 	    bitTotal += Character.getNumericValue(bit);
@@ -33,7 +33,8 @@ public class L2Frame {
 	   
     }
 
-    String toString() {
+    @Override
+    public String toString() {
 	return "0"
 	    + toBinary(destination, 4)
 	    + toBinary(source, 4)

@@ -9,6 +9,11 @@ public class L2Handler implements L2Listener {
 	handler.setListener(this);
     }
 
+    @Override
+    public toString() {
+	return this.macAddr;
+    }
+
     int getMacAddr() {
 	return macAddr;
     }
