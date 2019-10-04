@@ -3,6 +3,7 @@ public class L2FrameTest {
 		testContructors();
 		testToBinary();
 		testComputeErrorCheck();
+		testToString();
 		System.out.println("All tests passed!");
 
 	}
@@ -23,6 +24,14 @@ public class L2FrameTest {
 	}
 
 	private static void testComputeErrorCheck() {
+		assert L2Frame.computeErrorCheck("0") == 0;
+		assert L2Frame.computeErrorCheck("1") == 1;
+		assert L2Frame.computeErrorCheck("00011000") == 0;
+		assert L2Frame.computeErrorCheck("100011011100111") == 1;
+	}
 
+	private static void testToString() {
+		L2Frame l1 = new L2Frame(0, 1, 0, "Hello");
+		assert l1.toString().equals("000010000000000000000Hello");
 	}
 }
