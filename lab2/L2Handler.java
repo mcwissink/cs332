@@ -23,7 +23,7 @@ public class L2Handler implements BitListener {
     }
 
     public void setListener(L2Listener l) {
-		l2Listener = l;
+        l2Listener = l;
     }	
 
     void send(L2Frame frame) {
