@@ -40,6 +40,6 @@ public class L2Handler implements BitListener {
     }
 
 	public void bitsReceived(BitHandler h, String bits) {
-		l2Listener.frameRecieved(L2Handler.this, new L2Frame(bits));
+		l2Listener.frameReceived(L2Handler.this, new L2Frame(bits));
 	}
 }
