@@ -40,6 +40,9 @@ public class L2Handler implements BitListener {
     }
 
 	public void bitsReceived(BitHandler h, String bits) {
-		l2Listener.frameReceived(L2Handler.this, new L2Frame(bits));
+        L2Frame frame = new L2Frame(bits);
+        if (frame.getDestination() == macAddr) {
+            l2Listener.frameReceived(L2Handler.this, new L2Frame(bits));
+        }
 	}
 }
