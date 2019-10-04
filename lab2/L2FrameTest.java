@@ -17,7 +17,7 @@ public class L2FrameTest {
 	}
 
 	private static void testToBinary() {
-		assert L2Frame.toBinary(1, 4).equals("0001");
+        assert L2Frame.toBinary(1, 4).equals("0001");
 		assert L2Frame.toBinary(2, 4).equals("0010");
 		assert L2Frame.toBinary(3, 4).equals("0011");
 		assert L2Frame.toBinary(15, 4).equals("1111");
