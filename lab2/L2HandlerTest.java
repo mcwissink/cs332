@@ -1,16 +1,16 @@
 public class L2HandlerTest {
 	public static void main(String[] args) {
-		testContructors();
-	}
+    final String payload = "1010";
 
-	private static void testContructors() {
+    System.out.println("Running tests...");
 		LightSystem system = new LightSystem();
     L2Handler lh1 = new L2Handler(0);
     assert lh1.getMacAddr() == 0;
     assert lh1.toString() == "0";
     lh1.setListener(new L2Listener() {
         public void frameReceived(L2Handler h, L2Frame f) {
-          System.out.println("Received Payload: " + f.getPayload());
+          assert f.getPayload() == payload;
+          System.out.println("Tests passed. Done!");
         }
       });
     L2Handler lh2 = new L2Handler(1);
@@ -20,11 +20,6 @@ public class L2HandlerTest {
       });
     assert lh2.getMacAddr() == 1;
     assert lh2.toString() == "1";
-    String payload = "1010";
-    System.out.println("Sending Payload: " + payload);
     lh2.send(new L2Frame(lh2.getMacAddr(), 0, 0, payload));
-
-    // L2Handler lh2 = new L2Handler("127.0.0.1", 9000, 1);
-
 	}
 }
