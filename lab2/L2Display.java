@@ -34,7 +34,7 @@ public class L2Display implements ActionListener, L2Listener {
 		frame.setVisible(true);
 	}
 
-	public void frameRecieved(L2Handler h, L2Frame f){
+	public void frameReceived(L2Handler h, L2Frame f){
         System.out.println(f.getPayload());
     }
 

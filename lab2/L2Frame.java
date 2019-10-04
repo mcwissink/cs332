@@ -15,7 +15,6 @@ public class L2Frame {
         this.payloadSize = payload.length();
 		this.payload = payload;
 		this.type = 0;
-        System.out.println("Sending: " + this.toString());
 	}
 	
 	public L2Frame(String bits){
