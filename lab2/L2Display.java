@@ -35,14 +35,17 @@ public class L2Display implements ActionListener, L2Listener {
 	}
 
 	public void frameReceived(L2Handler h, L2Frame f){
-        System.out.println(f.getPayload());
+		String display;
+		display = "source: " + f.getSource() + ", payload: " + f.getPayload();
+		displayField.setText(display);
+        // System.out.println(f.getPayload());
     }
 
 	public void actionPerformed(ActionEvent e) {
 		displayField.setText("Sending...");
 		new Thread() {
 			public void run() {
-				handler.send(new L2Frame(0, 1, 0, "hello"));
+				handler.send(new L2Frame(Integer.parseInt(addressField.getText()), handler.getMacAddr(), 0, payloadField.getText()));
 			}
 		}.start();
 	}
