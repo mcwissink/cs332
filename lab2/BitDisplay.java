@@ -2,8 +2,8 @@ import java.awt.event.*;
 import javax.swing.*;
 
 public class BitDisplay implements ActionListener, BitListener {
-	private BitHandler handler;
-	private JTextField receiveField;
+  private BitHandler handler;
+ 	private JTextField receiveField;
 	private JTextField sendField;
 
 	public BitDisplay(BitHandler handler) {

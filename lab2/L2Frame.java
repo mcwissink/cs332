@@ -12,18 +12,21 @@ public class L2Frame {
 		this.source = source;
 		this.destination = destination;
 		this.vlanId = vlanId;
+        this.payloadSize = payload.length();
 		this.payload = payload;
 		this.type = 0;
+        System.out.println("Sending: " + this.toString());
 	}
 	
 	public L2Frame(String bits){
-		this.destination = toDecimal(bits.substring(0, 3));
-		this.source = toDecimal(bits.substring(3,7));
-		this.type = toDecimal(bits.substring(7, 8));
-		this.vlanId = toDecimal(bits.substring(8, 9));
-		this.payloadSize = toDecimal(bits.substring(9, 17));
-		this.payload = bits.substring(17, 17 + payloadSize);
-		this.checkSum = toDecimal(bits.substring(17 + payloadSize, bits.length()));
+        bits = bits.substring(1, bits.length());
+		this.destination = toDecimal(bits.substring(0, 4));
+		this.source = toDecimal(bits.substring(4, 8));
+		this.type = toDecimal(bits.substring(8, 10));
+		this.vlanId = toDecimal(bits.substring(10, 12));
+		this.payloadSize = toDecimal(bits.substring(12, 20));
+		this.payload = bits.substring(20, 20 + payloadSize);
+		this.checkSum = toDecimal(bits.substring(20 + payloadSize, bits.length()));
 		if (computeErrorCheck(bits.substring(0, bits.length() - 1)) != checkSum) {
 			//TODO: throw Illegal arugment exception
 			System.out.println("Bad Packet");
@@ -57,10 +60,14 @@ public class L2Frame {
 
 	@Override
 	public String toString() {
-		return "0" + toBinary(destination, 4) + toBinary(source, 4)
-		+ toBinary(type, 2)
-				+ toBinary(vlanId, 2) + toBinary(payloadSize, 8) + payload;
-		//  + toBinary(errorCheck, 1)
+		String frame = "0"
+            + toBinary(destination, 4)
+            + toBinary(source, 4)
+            + toBinary(type, 2)
+            + toBinary(vlanId, 2)
+            + toBinary(payloadSize, 8)
+            + payload;
+        return frame + toBinary(computeErrorCheck(frame), 1);
 	}
 
 	int getSource() {
