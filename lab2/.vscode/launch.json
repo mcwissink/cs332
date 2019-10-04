@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - L2FrameTest",
+            "request": "launch",
+            "mainClass": "L2FrameTest",
+            "projectName": "lab2_fa4a0b0e"
+        }
+    ]
+}

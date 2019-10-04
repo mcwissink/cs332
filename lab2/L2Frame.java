@@ -60,7 +60,7 @@ public class L2Frame {
 		return "0" + toBinary(destination, 4) + toBinary(source, 4)
 		+ toBinary(type, 2)
 				+ toBinary(vlanId, 2) + toBinary(payloadSize, 8) + payload;
-		// + toBinary(errorCheck, 1)
+		//  + toBinary(errorCheck, 1)
 	}
 
 	int getSource() {
