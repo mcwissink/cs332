@@ -33,10 +33,8 @@ public class L2Handler implements BitListener {
         try {
             handler.broadcast(frame.toString());
         } catch (CollisionException e)  {
-            // TODO fix this
-            System.out.println("Collisssions");
+            //shouldn't have to deal with collisions
         }
-        
     }
 
 	public void bitsReceived(BitHandler h, String bits) {

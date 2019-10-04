@@ -8,7 +8,7 @@ public class L2Frame {
 	private int checkSum;
 	private String payload;
 
-	public L2Frame(int source, int destination, int vlanId, String payload) {
+	public L2Frame(int destination, int source, int vlanId, String payload) {
 		this.source = source;
 		this.destination = destination;
 		this.vlanId = vlanId;
