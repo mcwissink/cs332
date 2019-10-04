@@ -31,7 +31,7 @@ public class L2FrameTest {
 	}
 
 	private static void testToString() {
-		L2Frame l1 = new L2Frame(0, 1, 0, "Hello");
-		assert l1.toString().equals("000010000000000000000Hello");
+		L2Frame l1 = new L2Frame(0, 1, 0, "111111");
+		assert l1.toString().equals("000010000000000000000111111");
 	}
 }

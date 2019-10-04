@@ -28,8 +28,7 @@ public class L2Frame {
 		this.payload = bits.substring(20, 20 + payloadSize);
 		this.checkSum = toDecimal(bits.substring(20 + payloadSize, bits.length()));
 		if (computeErrorCheck(bits.substring(0, bits.length() - 1)) != checkSum) {
-			//TODO: throw Illegal arugment exception
-			System.out.println("Bad Packet");
+			throw new IllegalArgumentException();
 		}
 	}
 
