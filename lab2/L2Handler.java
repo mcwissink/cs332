@@ -66,7 +66,7 @@ public class L2Handler implements BitListener {
         try {
             handler.broadcast(frame.toString());
         } catch (CollisionException e) {
-            //shouldn't have to deal with collisions
+            // shouldn't have to deal with collisions
         }
     }
 

@@ -2,6 +2,11 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+/**
+ * This class implements a LightPanel to represent a light with a switch that a
+ * user and flip on and off to turn on and off the light. Keeps track of a
+ * unique ID for the light it represents
+ */
 public class LightPanel extends Thread {
     private static Set idsUsed = new HashSet();
 
@@ -11,10 +16,21 @@ public class LightPanel extends Thread {
     private BufferedReader in;
     private boolean isHigh = false;
 
+    /**
+     * Default Constructor: calls explicit constructor with a default host and port
+     * of the LightSystem
+     */
     public LightPanel() {
         this("localhost", LightSystem.DEFAULT_PORT);
     }
 
+    /**
+     * Explicit Constructor: stores the given host and port info creates a
+     * connection to the server with host and port starts the client
+     * 
+     * @param host: name of the Host
+     * @param port: port of the Host
+     */
     public LightPanel(String host, int port) {
         do {
             id = LightSystem.getRandom().nextInt(15) + 1;
@@ -32,14 +48,23 @@ public class LightPanel extends Thread {
         }
     }
 
+    /**
+     * Sends a message to the LightSystem that this light panel has turned on
+     */
     public void switchOn() {
         out.println(LightSystem.HIGH);
     }
 
+    /**
+     * Sends a message to the LightSystem that this light panel has turned off
+     */
     public void switchOff() {
         out.println(LightSystem.LOW);
     }
 
+    /**
+     * Closes the connection to the LightSystem
+     */
     public void close() {
         try {
             out.close();
@@ -50,6 +75,11 @@ public class LightPanel extends Thread {
         }
     }
 
+    /**
+     * Infinite loop that listens to changes on the LightSystem and updates the
+     * light panel accordingly. throws an expection when the LightPanel loses
+     * connection
+     */
     public void run() {
         try {
             String line = in.readLine();

@@ -91,17 +91,13 @@ public class L2Frame {
     /**
      * Convert an L2Frame to a (bit)String with a CRC bit at the end
      *
-     * @return String A Bitstring representing an L2Frame with a leading 0 and a CRC bit
+     * @return String A Bitstring representing an L2Frame with a leading 0 and a CRC
+     *         bit
      */
     @Override
     public String toString() {
-        String frame = "0"
-            + toBinary(destination, 4)
-            + toBinary(source, 4)
-            + toBinary(type, 2)
-            + toBinary(vlanId, 2)
-            + toBinary(payloadSize, 8)
-            + payload;
+        String frame = "0" + toBinary(destination, 4) + toBinary(source, 4) + toBinary(type, 2) + toBinary(vlanId, 2)
+                + toBinary(payloadSize, 8) + payload;
         return frame + toBinary(computeErrorCheck(frame), 1);
     }
 

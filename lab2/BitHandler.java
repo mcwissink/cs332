@@ -1,3 +1,7 @@
+/**
+ * This class implements a BitHandler that recieves a string of 0s and 1s from a
+ * BitListener and sends the information to the LightPanel
+ */
 public class BitHandler extends Thread {
     public static final int HALFPERIOD = 150;
 
@@ -12,15 +16,28 @@ public class BitHandler extends Thread {
     private BitListener listener;
     private String state = SILENCE;
 
+    /**
+     * Default Constructor that initializes a BitHandler using localhost and the
+     * default port
+     */
     public BitHandler() {
         this("localhost", LightSystem.DEFAULT_PORT);
     }
 
+    /**
+     * Explicit Constructor uses a specified hostname/IP address and port
+     */
     public BitHandler(String host, int port) {
         panel = new LightPanel(host, port);
         start();
     }
 
+    /**
+     * Pause a thread for a given period of time
+     * 
+     * @param milliseconds the number of milliseconds to wait before resuming
+     *                     execution
+     */
     public static void pause(int milliseconds) {
         try {
             Thread.sleep(milliseconds);
@@ -190,6 +207,9 @@ public class BitHandler extends Thread {
         return panel.getID();
     }
 
+    /**
+     * If there is a listener, notify it that there were bits received
+     */
     private void notifyReceived(final String bits) {
         if (listener == null)
             return;

@@ -8,8 +8,7 @@ public class L2Display implements ActionListener, L2Listener {
     private JTextField payloadField;
 
     /**
-     * Constructor for L2Display
-     * L2Display displays layer 2 packets
+     * Constructor for L2Display L2Display displays layer 2 packets
      *
      * @param handler The L2 Handler
      */
@@ -61,7 +60,8 @@ public class L2Display implements ActionListener, L2Listener {
         displayField.setText("Sending...");
         new Thread() {
             public void run() {
-                handler.send(new L2Frame(Integer.parseInt(addressField.getText()), handler.getMacAddr(), 0, payloadField.getText()));
+                handler.send(new L2Frame(Integer.parseInt(addressField.getText()), handler.getMacAddr(), 0,
+                        payloadField.getText()));
             }
         }.start();
     }

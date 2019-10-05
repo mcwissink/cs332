@@ -1,12 +1,21 @@
 import java.awt.event.*;
 import javax.swing.*;
 
+/**
+ * this class implements a LightDisplay that references a LightPanel, contains
+ * the UI elements to show the status of the light and to turn it on and off
+ */
 public class LightDisplay extends Thread implements ActionListener {
     private LightPanel panel;
     private ImageIcon lightOffIcon;
     private ImageIcon lightOnIcon;
     private JLabel lightLabel;
 
+    /**
+     * Constructor Set up the LightDisplay
+     * 
+     * @param panel
+     */
     public LightDisplay(LightPanel panel) {
         this.panel = panel;
 
@@ -40,6 +49,12 @@ public class LightDisplay extends Thread implements ActionListener {
         start();
     }
 
+    /**
+     * When an event occurs, check the status of the event if it is on -> switch the
+     * panel to on and vice versa
+     * 
+     * @param e: event that happens (switch flipped on or off)
+     */
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("on"))
             panel.switchOn();
@@ -47,6 +62,10 @@ public class LightDisplay extends Thread implements ActionListener {
             panel.switchOff();
     }
 
+    /**
+     * Continuously check if the light is set to on, if it is -> set set the icon to
+     * the on picture and vice versa
+     */
     public void run() {
         while (true) {
             if (panel.isOn())
