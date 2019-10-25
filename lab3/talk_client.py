@@ -15,12 +15,13 @@ parser.add_argument("-v", "--verbose", action="store_true", dest="verbose",
                     help="turn verbose output on")
 args = parser.parse_args()
  
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+with socket.socket() as s:
     s.connect((args.server, args.port))
+    username = args.name if args.name else socket.gethostname()
     while True:
         readable, writable, exceptional = select.select([s, sys.stdin], [], [s])
         for r in readable:
             if r == s:
                 print(r.recv(4096).decode("utf-8"))
             else:
-                s.send(r.readline().rstrip().encode())
+                s.send((username + ": " + r.readline().rstrip()).encode())
