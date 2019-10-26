@@ -1,7 +1,12 @@
+# TalkClient
+# Authors: Mark Wissink and Joshua Wilson
+# Date: 10/26/19
+
 import select
 import socket
 import sys
 import argparse
+import logging
 
 
 parser = argparse.ArgumentParser(description="A prattle client")
@@ -15,29 +20,65 @@ parser.add_argument("-v", "--verbose", action="store_true", dest="verbose",
                     help="turn verbose output on")
 args = parser.parse_args()
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    try:
-        s.connect((args.server, args.port))
-        username = args.name if args.name else socket.gethostname()
-        s.settimeout(2)
-        while True:
-            readable, writable, exceptional = select.select([s, sys.stdin], [], [s, sys.stdin])
-            for r in readable:
-                if r == s:
-                    try:
-                        data = r.recv(2048).decode("utf-8")
-                        if not data:
-                            print("The server died")
-                            exit()
-                        print(data)
-                    except:
-                        print("Something went wrong")
-                        exit()
-                else:
-                    try:
-                        s.send((username + ": " + r.readline().rstrip()).encode())
-                    except:
-                        print("An error has occured")
-                        exit()
-    except:
-        print("Couldn't connect")
+verbose = args.verbose
+server = None
+hostname = socket.gethostname()
+
+# Initialize the socket
+try:
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    if verbose:
+        print("/Initializing socket on %s (%s)" % (hostname, socket.gethostbyname(hostname)))
+except:
+    print("Failed to initialize socket")
+    exit()
+
+# Connect to the server
+try:
+    server.connect((args.server, args.port))
+    if verbose:
+        print("/Connected to %s:%s" % server.getpeername())
+except:
+    print("Failed to connect to server")
+    exit()
+
+
+username = args.name if args.name else hostname
+inputs = [server, sys.stdin]
+print("Welcome to TalkClient. Type /exit to quit")
+while True:
+    readable, writable, exceptional = select.select(inputs, [], [])
+    for r in readable:
+        # Reading from server socket
+        if r == server:
+            data = None
+            try:
+                data = r.recv(2048).decode("utf-8")
+                if verbose:
+                    print("/Received data: '%s'" % data)
+            except:
+                print("Failed to read data from server")
+                exit()
+            # No data means the server went down
+            if not data:
+                print("Server disconnected. Try reconnecting to the server")
+                exit()
+            print(data)
+        # Reading from stdin
+        else:
+            line = r.readline().rstrip()
+            # Handle any commands from the user
+            if line[0] == "/":
+                command = line[1:]
+                if command == "exit":
+                    server.close()
+                    exit()
+            else:
+                message = username + ": " + line
+                try:
+                    if verbose:
+                        print("/Sending data: '%s'" % message);
+                    server.send(message.encode())
+                except:
+                    print("Failed to send data to server")
+                    exit()
