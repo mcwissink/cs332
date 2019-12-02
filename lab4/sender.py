@@ -18,6 +18,6 @@ parser.add_argument("-v", "--verbose", action="store_true", dest="verbose",
                     help="turn verbose output on")
 args = parser.parse_args()
 
-data = "Hello, World!"
+data = "Hello, World!\n"
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.sendto(data.encode(), (args.address, args.port))
