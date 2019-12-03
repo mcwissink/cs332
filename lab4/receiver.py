@@ -24,7 +24,7 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind((address, args.port))
 print("Listening on port %s:%s" % (address, args.port))
 
-with open(args.out, 'w') as out:
+with open(args.out, 'wb') as f:
     while True:
         data, addr = sock.recvfrom(1024)
-        out.write(data.decode("utf-8"))
+        f.write(data)

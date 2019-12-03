@@ -21,9 +21,9 @@ args = parser.parse_args()
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 print("Sending %s to %s:%s" % (args.filename, args.address, args.port))
-with open(args.filename, 'r') as f:
+with open(args.filename, 'rb') as f:
     while True:
         data = f.read(1024)
-        if data == '':
+        if not data:
             break
-        sock.sendto(data.encode(), (args.address, args.port))
+        sock.sendto(data, (args.address, args.port))
