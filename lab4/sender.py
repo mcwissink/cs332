@@ -24,16 +24,15 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 print("Sending %s to %s:%s" % (args.filename, args.address, args.port))
 with open(args.filename, 'rb') as f:
     while True:
-        data = f.read(1024)
-        sock.sendto(data, addr)
-        if not data:
-            break
-
-        data, addr = sock.recvfrom(1024)
-        print(data)
-        if data.decode("utf-8") != "ACK":
+        send_data = f.read(1024)
+        sock.sendto(send_data, addr)
+        recv_data, addr = sock.recvfrom(1024)
+        if recv_data.decode("utf-8") != "ACK":
             print("Failed to ACK")
             break
+        if not send_data: # EOF
+            break
+
     f.close()
     print("Sent file")
 
