@@ -26,10 +26,12 @@ print("Listening on port %s:%s" % (address, args.port))
 
 with open(args.out, 'wb') as f:
     while True:
+        # Receive data from the sender
         data, addr = sock.recvfrom(1024)
+        # Send an ACK
         sock.sendto("ACK".encode(), addr)
         if not data: # EOF
             break
+        # Write the data to the file
         f.write(data)
     f.close()
-    print("Received file")
