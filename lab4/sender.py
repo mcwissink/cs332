@@ -18,12 +18,22 @@ parser.add_argument("-p", "--port", dest="port", type=int, default=22222,
 parser.add_argument("-v", "--verbose", action="store_true", dest="verbose",
                     help="turn verbose output on")
 args = parser.parse_args()
+addr = (args.address, args.port)
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 print("Sending %s to %s:%s" % (args.filename, args.address, args.port))
 with open(args.filename, 'rb') as f:
     while True:
         data = f.read(1024)
+        sock.sendto(data, addr)
         if not data:
             break
-        sock.sendto(data, (args.address, args.port))
+
+        data, addr = sock.recvfrom(1024)
+        print(data)
+        if data.decode("utf-8") != "ACK":
+            print("Failed to ACK")
+            break
+    f.close()
+    print("Sent file")
+
