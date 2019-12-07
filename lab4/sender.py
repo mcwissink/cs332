@@ -32,7 +32,7 @@ with open(args.filename, 'rb') as f:
     while True:
         # Send the data we read from the file
         read_data = f.read(1024)
-        send_data = connection_id.to_bytes(4, byteorder='big') + read_data
+        send_data = connection_id.to_bytes(4, byteorder='little') + read_data
         print("sending data")
         sock.sendto(send_data, addr)
         # Receive an ACK from the receiver
