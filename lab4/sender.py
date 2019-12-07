@@ -7,6 +7,8 @@
 import socket
 import argparse
 import sys
+import random
+import os
 
 parser = argparse.ArgumentParser(description="A prattle client")
 
@@ -21,11 +23,17 @@ args = parser.parse_args()
 addr = (args.address, args.port)
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+connection_id = random.getrandbits(32)
+total_bytes = os.path.getsize(args.filename)
+packet_number = 0;
+
 print("Sending %s to %s:%s" % (args.filename, args.address, args.port))
 with open(args.filename, 'rb') as f:
     while True:
         # Send the data we read from the file
-        send_data = f.read(1024)
+        read_data = f.read(1024)
+        send_data = connection_id.to_bytes(4, byteorder='big') + read_data
+        print("sending data")
         sock.sendto(send_data, addr)
         # Receive an ACK from the receiver
         recv_data, addr = sock.recvfrom(1024)
@@ -33,7 +41,8 @@ with open(args.filename, 'rb') as f:
         if recv_data.decode("utf-8") != "ACK":
             print("Failed to ACK")
             break
-        if not send_data: # EOF
+        if not read_data: # EOF
             break
+        packet_number += 1
     f.close()
 
