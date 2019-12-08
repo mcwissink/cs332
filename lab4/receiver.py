@@ -29,11 +29,13 @@ with open(args.out, 'wb') as f:
     while True:
         # Receive data from the sender
         data, addr = sock.recvfrom(1036)
-        rcmp_packet = packets.DataPacket.parse_bytes(data)
+        data_packet = packets.DataPacket.parse_bytes(data)
         # Send an ACK
-        sock.sendto("ACK".encode(), addr)
-        if not rcmp_packet.get_data(): # EOF
+        ack_packet = packets.ACKPacket(data_packet.get_connection_id(), data_packet.get_number())
+        print("Sending ACK:", data_packet.get_number(), ack_packet.get_number())
+        sock.sendto(ack_packet.as_bytes(), addr)
+        if not data_packet.get_data(): # EOF
             break
         # Write the data to the file
-        f.write(rcmp_packet.get_data())
+        f.write(data_packet.get_data())
     f.close()

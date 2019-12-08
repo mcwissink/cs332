@@ -33,13 +33,15 @@ with open(args.filename, 'rb') as f:
     while True:
         # Send the data we read from the file
         read_data = f.read(1024)
-        rcmp_packet = packets.DataPacket(connection_id, total_bytes, packet_number, read_data)
+        data_packet = packets.DataPacket(connection_id, total_bytes, packet_number, read_data)
         print("sending data")
-        sock.sendto(rcmp_packet.as_bytes(), addr)
+        sock.sendto(data_packet.as_bytes(), addr)
         # Receive an ACK from the receiver
         recv_data, addr = sock.recvfrom(1024)
+        ack_packet = packets.ACKPacket.parse_bytes(recv_data)
         # Check if we got an ACK
-        if recv_data.decode("utf-8") != "ACK":
+        print("Received ACK:", ack_packet.get_number(), data_packet.get_number())
+        if ack_packet.get_number() != data_packet.get_number():
             print("Failed to ACK")
             break
         if not read_data: # EOF
