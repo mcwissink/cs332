@@ -28,7 +28,7 @@ print("Listening on port %s:%s" % (address, args.port))
 with open(args.out, 'wb') as f:
     while True:
         # Receive data from the sender
-        data, addr = sock.recvfrom(1028)
+        data, addr = sock.recvfrom(1036)
         rcmp_packet = packets.DataPacket.parse_bytes(data)
         # Send an ACK
         sock.sendto("ACK".encode(), addr)
