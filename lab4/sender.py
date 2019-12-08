@@ -9,6 +9,7 @@ import argparse
 import sys
 import random
 import os
+import packets
 
 parser = argparse.ArgumentParser(description="A prattle client")
 
@@ -32,9 +33,9 @@ with open(args.filename, 'rb') as f:
     while True:
         # Send the data we read from the file
         read_data = f.read(1024)
-        send_data = connection_id.to_bytes(4, byteorder='little') + read_data
+        rcmp_packet = packets.DataPacket(connection_id, total_bytes, packet_number, read_data)
         print("sending data")
-        sock.sendto(send_data, addr)
+        sock.sendto(rcmp_packet.as_bytes(), addr)
         # Receive an ACK from the receiver
         recv_data, addr = sock.recvfrom(1024)
         # Check if we got an ACK
