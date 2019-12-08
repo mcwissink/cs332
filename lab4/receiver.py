@@ -7,6 +7,7 @@
 import socket
 import argparse
 import sys
+import packets
 
 parser = argparse.ArgumentParser(description="A prattle client")
 
@@ -28,11 +29,11 @@ with open(args.out, 'wb') as f:
     while True:
         # Receive data from the sender
         data, addr = sock.recvfrom(1028)
-        write_data = data[4:]
+        rcmp_packet = packets.DataPacket.parse_bytes(data)
         # Send an ACK
         sock.sendto("ACK".encode(), addr)
-        if not write_data: # EOF
+        if not rcmp_packet.get_data(): # EOF
             break
         # Write the data to the file
-        f.write(write_data)
+        f.write(rcmp_packet.get_data())
     f.close()
