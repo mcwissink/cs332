@@ -34,7 +34,7 @@ with open(args.filename, 'rb') as f:
         # Send the data we read from the file
         read_data = f.read(1024)
         data_packet = packets.DataPacket(connection_id, total_bytes, packet_number, read_data)
-        print("sending data")
+        print(data_packet.as_bytes())
         sock.sendto(data_packet.as_bytes(), addr)
         # Receive an ACK from the receiver
         recv_data, addr = sock.recvfrom(1024)
