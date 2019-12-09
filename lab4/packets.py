@@ -1,15 +1,30 @@
+# packets.py
+# Represents various kinds of packets
+#
+# Mark Wissink (mcw33) and Theron Tjapkes (tpt3)
+
 class DataPacket:
-    DATA_FIELDS = {
+    DATA_SIZE = 1450
+    FIELDS = {
         "connection_id": 4,
         "total_bytes": 4,
-        "packet_number": 4
+        "packet_number": 4,
+        "ack": 1
     }
 
-    def __init__(self, connection_id, total_bytes, number, data):
+    def __init__(self, connection_id, total_bytes, number, ack, data):
         self._connection_id = connection_id
         self._total_bytes = total_bytes
         self._number = number
+        self._ack = ack
         self._data = data
+   
+    @staticmethod
+    def get_size():
+        size = DataPacket.DATA_SIZE
+        for value in DataPacket.FIELDS.values():
+            size += value
+        return size
 
     def get_connection_id(self):
         return self._connection_id
@@ -20,31 +35,35 @@ class DataPacket:
     def get_number(self):
         return self._number
 
+    def get_ack(self):
+        return self._ack
+
     def get_data(self):
         return self._data
 
     @staticmethod
     def parse_bytes(packet):
-        field_keys = list(DataPacket.DATA_FIELDS.keys())
+        field_keys = list(DataPacket.FIELDS.keys())
         header = [None] * len(field_keys)
         offset = 0
         # For each field in the header, parse the value of the field from the packet
-        for field in DataPacket.DATA_FIELDS:
+        for field in DataPacket.FIELDS:
             header[field_keys.index(field)] = \
                 int.from_bytes(
-                    packet[offset:offset + DataPacket.DATA_FIELDS[field]], byteorder='big')
-            offset += DataPacket.DATA_FIELDS[field]
-        return DataPacket(header[0], header[1], header[2], packet[offset:])
+                    packet[offset:offset + DataPacket.FIELDS[field]], byteorder='big')
+            offset += DataPacket.FIELDS[field]
+        return DataPacket(header[0], header[1], header[2], header[3], packet[offset:])
 
     def as_bytes(self):
-        return self._connection_id.to_bytes(DataPacket.DATA_FIELDS["connection_id"], byteorder='big') \
-            + self._total_bytes.to_bytes(DataPacket.DATA_FIELDS["total_bytes"], byteorder='big') \
-            + self._number.to_bytes(DataPacket.DATA_FIELDS["packet_number"], byteorder='big') \
+        return self._connection_id.to_bytes(DataPacket.FIELDS["connection_id"], byteorder='big') \
+            + self._total_bytes.to_bytes(DataPacket.FIELDS["total_bytes"], byteorder='big') \
+            + self._number.to_bytes(DataPacket.FIELDS["packet_number"], byteorder='big') \
+            + self._ack.to_bytes(DataPacket.FIELDS["ack"], byteorder='big') \
             + self._data
 
 
 class ACKPacket:
-    ACK_FIELDS = {
+    FIELDS = {
         "connection_id": 4,
         "packet_number": 4
     }
@@ -52,6 +71,13 @@ class ACKPacket:
     def __init__(self, connection_id, number):
         self._connection_id = connection_id
         self._number = number
+    
+    @staticmethod
+    def get_size():
+        size = 0
+        for value in ACKPacket.FIELDS.values():
+            size += value
+        return size
 
     def get_connection_id(self):
         return self._connection_id
@@ -61,17 +87,17 @@ class ACKPacket:
 
     @staticmethod
     def parse_bytes(packet):
-        field_keys = list(ACKPacket.ACK_FIELDS.keys())
+        field_keys = list(ACKPacket.FIELDS.keys())
         header = [None] * len(field_keys)
         offset = 0
         # For each field in the header, parse the value of the field from the packet
-        for field in ACKPacket.ACK_FIELDS:
+        for field in ACKPacket.FIELDS:
             header[field_keys.index(field)] = \
                 int.from_bytes(
-                    packet[offset:offset + ACKPacket.ACK_FIELDS[field]], byteorder='big')
-            offset += ACKPacket.ACK_FIELDS[field]
+                    packet[offset:offset + ACKPacket.FIELDS[field]], byteorder='big')
+            offset += ACKPacket.FIELDS[field]
         return ACKPacket(header[0], header[1])
 
     def as_bytes(self):
-        return self._connection_id.to_bytes(ACKPacket.ACK_FIELDS["connection_id"], byteorder='big') \
-            + self._number.to_bytes(ACKPacket.ACK_FIELDS["packet_number"], byteorder='big')
+        return self._connection_id.to_bytes(ACKPacket.FIELDS["connection_id"], byteorder='big') \
+            + self._number.to_bytes(ACKPacket.FIELDS["packet_number"], byteorder='big')

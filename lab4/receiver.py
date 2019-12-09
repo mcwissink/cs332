@@ -2,7 +2,7 @@
 # Receives a file over UDP
 # Adapted from: https://wiki.python.org/moin/UdpCommunication
 #
-# Mark Wissink (mcw33) Theron (tjs3)
+# Mark Wissink (mcw33) and Theron Tjapkes (tpt3)
 
 import socket
 import argparse
@@ -28,11 +28,13 @@ print("Listening on port %s:%s" % (address, args.port))
 with open(args.out, 'wb') as f:
     while True:
         # Receive data from the sender
-        data, addr = sock.recvfrom(1036)
+        data, addr = sock.recvfrom(packets.DataPacket.get_size())
         data_packet = packets.DataPacket.parse_bytes(data)
         # Send an ACK
-        ack_packet = packets.ACKPacket(data_packet.get_connection_id(), data_packet.get_number())
-        sock.sendto(ack_packet.as_bytes(), addr)
+        if data_packet.get_ack():
+            #print("sending ack for packet %d" % data_packet.get_number())
+            ack_packet = packets.ACKPacket(data_packet.get_connection_id(), data_packet.get_number())
+            sock.sendto(ack_packet.as_bytes(), addr)
         if not data_packet.get_data(): # EOF
             break
         # Write the data to the file

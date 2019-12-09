@@ -2,7 +2,7 @@
 # Sends a file over UDP
 # Adapted from: https://wiki.python.org/moin/UdpCommunication
 #
-# Mark Wissink (mcw33) Theron (tjs3)
+# Mark Wissink (mcw33) and Theron Tjapkes (tpt3)
 
 import socket
 import argparse
@@ -13,7 +13,8 @@ import packets
 
 parser = argparse.ArgumentParser(description="A prattle client")
 
-parser.add_argument("-f", "--filename", dest="filename", help="The file to send")
+parser.add_argument("-f", "--filename", dest="filename",
+                    help="The file to send")
 parser.add_argument("-a", "--address", dest="address", default="127.0.0.1",
                     help="IP address (default: 127.0.0.1)")
 parser.add_argument("-p", "--port", dest="port", type=int, default=22222,
@@ -26,24 +27,34 @@ addr = (args.address, args.port)
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 connection_id = random.getrandbits(32)
 total_bytes = os.path.getsize(args.filename)
-packet_number = 0;
+packet_number = 0
+next_ack = 0
+ack_gap = 0
 
 print("Sending %s to %s:%s" % (args.filename, args.address, args.port))
 with open(args.filename, 'rb') as f:
     while True:
         # Send the data we read from the file
-        read_data = f.read(1024)
-        data_packet = packets.DataPacket(connection_id, total_bytes, packet_number, read_data)
+        read_data = f.read(packets.DataPacket.DATA_SIZE)
+        ack = 0
+        if packet_number == next_ack:
+            ack = 1
+            ack_gap += 1
+            next_ack += ack_gap
+        data_packet = packets.DataPacket(
+            connection_id, total_bytes, packet_number, ack, read_data)
         sock.sendto(data_packet.as_bytes(), addr)
         # Receive an ACK from the receiver
-        recv_data, addr = sock.recvfrom(1024)
-        ack_packet = packets.ACKPacket.parse_bytes(recv_data)
-        # Check if we got an ACK
-        if ack_packet.get_number() != data_packet.get_number():
-            print("Failed to ACK")
-            break
-        if not read_data: # EOF
+        if ack:
+            #print("acking packet %d" % packet_number)
+            recv_data, addr = sock.recvfrom(packets.ACKPacket.get_size())
+            ack_packet = packets.ACKPacket.parse_bytes(recv_data)
+            # Check if we got an ACK
+            if ack_packet.get_number() != data_packet.get_number():
+                print("Failed to ACK")
+                break
+        if not read_data:  # EOF
             break
         packet_number += 1
-    f.close()
 
+    f.close()
