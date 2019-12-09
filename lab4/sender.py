@@ -34,13 +34,11 @@ with open(args.filename, 'rb') as f:
         # Send the data we read from the file
         read_data = f.read(1024)
         data_packet = packets.DataPacket(connection_id, total_bytes, packet_number, read_data)
-        print(data_packet.as_bytes())
         sock.sendto(data_packet.as_bytes(), addr)
         # Receive an ACK from the receiver
         recv_data, addr = sock.recvfrom(1024)
         ack_packet = packets.ACKPacket.parse_bytes(recv_data)
         # Check if we got an ACK
-        print("Received ACK:", ack_packet.get_number(), data_packet.get_number())
         if ack_packet.get_number() != data_packet.get_number():
             print("Failed to ACK")
             break
