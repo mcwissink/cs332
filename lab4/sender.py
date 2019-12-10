@@ -41,9 +41,8 @@ with open(args.filename, 'rb') as f:
     while True:
         # Send the data we read from the file
         read_data = f.read(packets.DataPacket.DATA_SIZE)
-        ack = 0
-        if packet_number == next_ack:
-            ack = 1
+        ack = 1 if packet_number == next_ack else 0
+
         data_packet = packets.DataPacket(
             connection_id, total_bytes, packet_number, ack, read_data)
         if args.verbose:
