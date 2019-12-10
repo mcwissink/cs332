@@ -30,6 +30,9 @@ sock.settimeout(0.1)
 connection_id = random.getrandbits(32)
 total_bytes = os.path.getsize(args.filename)
 
+# constants
+MAX_FINAL_ATTEMPTS = 5
+
 # variables
 last_successful = -1  # last packet that was ACKed successfully
 packet_number = 0  # current packet to be sent
@@ -81,7 +84,7 @@ with open(args.filename, 'rb') as f:
                         if args.verbose:
                             print("Failed to ack final packet %d times" %
                                 final_attempts)
-                        if final_attempts == 5:   
+                        if final_attempts == MAX_FINAL_ATTEMPTS:
                             print("Failed to ACK final packet, receiver probably got it and exited")
                             break
                 if args.verbose:
