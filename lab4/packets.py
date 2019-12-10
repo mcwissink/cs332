@@ -16,8 +16,13 @@ class DataPacket:
         self._connection_id = connection_id
         self._total_bytes = total_bytes
         self._number = number
-        self._ack = ack
+        # final packet has no data and final packet should always ACK
+        if not data:
+            self._ack = 1
+        else:
+            self._ack = ack
         self._data = data
+        
    
     @staticmethod
     def get_size():
