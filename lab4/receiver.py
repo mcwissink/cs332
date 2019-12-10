@@ -1,4 +1,4 @@
-# sender.py
+# receiver.py
 # Receives a file over UDP
 # Adapted from: https://wiki.python.org/moin/UdpCommunication
 #

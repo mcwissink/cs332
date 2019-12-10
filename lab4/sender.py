@@ -82,6 +82,7 @@ with open(args.filename, 'rb') as f:
                 next_ack = packet_number
                 # Only occurs when data field of packet empty (last packet)
                 if data_packet.get_ack() != ack and not data_packet.get_data():
+                    print("Failed ACK for last packet")
                     for i in range(0, 5):
                         try:
                             recv_data, addr = sock.recvfrom(
@@ -94,7 +95,7 @@ with open(args.filename, 'rb') as f:
                         except:
                             if args.verbose:
                                 print("Failed to ack final packet %d times" %
-                                    i+1)
+                                    (i + 1))
                     print("Failed to ACK final packet, receiver probably got it and exited")
                     break
                 continue
