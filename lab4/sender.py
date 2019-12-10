@@ -35,7 +35,6 @@ last_successful = -1  # last packet that was ACKed successfully
 packet_number = 0  # current packet to be sent
 next_ack = 0  # next packet to be ACKed
 ack_gap = 0  # gap between ACKed packets
-final_packet_attempt = 0  # number of attempts to ACK final packet
 
 print("Sending %s to %s:%s" % (args.filename, args.address, args.port))
 with open(args.filename, 'rb') as f:
@@ -56,8 +55,9 @@ with open(args.filename, 'rb') as f:
                 print("ACKING PACKET %d" % packet_number)
             try:
                 success = False
-                while not success: # Wait for successful ACK
-                    recv_data, addr = sock.recvfrom(packets.ACKPacket.get_size())
+                while not success:  # Wait for successful ACK
+                    recv_data, addr = sock.recvfrom(
+                        packets.ACKPacket.get_size())
                     ack_packet = packets.ACKPacket.parse_bytes(recv_data)
                     if packet_number == ack_packet.get_number() and connection_id == ack_packet.get_connection_id():
                         if args.verbose:
@@ -72,21 +72,31 @@ with open(args.filename, 'rb') as f:
                         if args.verbose:
                             print("ACK RECIEVED FOR PACKET: %d WITH CONNECTION ID: %d" % (
                                 ack_packet.get_number(), ack_packet.get_connection_id()))
-            except socket.timeout: # ACK Failed
+            except socket.timeout:  # ACK Failed
                 if args.verbose:
                     print("FAILED ACK")
                 packet_number = last_successful + 1
-                f.seek(packet_number * packets.DataPacket.DATA_SIZE) # Seek to last successful packet
+                # Seek to last successful packet
+                f.seek(packet_number * packets.DataPacket.DATA_SIZE)
                 ack_gap = 0
                 next_ack = packet_number
-                if data_packet.get_ack() != ack:  # Only occurs when data field of packet empty (last packet)
-                    final_packet_attempt += 1
-                    if args.verbose:
-                        print("Failed to ack final packet %d times" %
-                              final_packet_attempt)
-                    if final_packet_attempt == 5: # attempt final packet 5 times
-                        print("Failed to ACK final packet, giving up")
-                        break
+                # Only occurs when data field of packet empty (last packet)
+                if data_packet.get_ack() != ack and not data_packet.get_data():
+                    for i in range(0, 5):
+                        try:
+                            recv_data, addr = sock.recvfrom(
+                                packets.ACKPacket.get_size())
+                            ack_packet = packets.ACKPacket.parse_bytes(
+                                recv_data)
+                            if packet_number == ack_packet.get_number() and connection_id == ack_packet.get_connection_id():
+                                if args.verbose:
+                                    print("ACK SUCCESSFUL")
+                        except:
+                            if args.verbose:
+                                print("Failed to ack final packet %d times" %
+                                    i+1)
+                    print("Failed to ACK final packet, receiver probably got it and exited")
+                    break
                 continue
 
         if not read_data:  # EOF
