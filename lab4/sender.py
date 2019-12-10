@@ -25,8 +25,10 @@ args = parser.parse_args()
 addr = (args.address, args.port)
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock.settimeout(1)
 connection_id = random.getrandbits(32)
 total_bytes = os.path.getsize(args.filename)
+last_successful = -1
 packet_number = 0
 next_ack = 0
 ack_gap = 0
@@ -39,22 +41,37 @@ with open(args.filename, 'rb') as f:
         ack = 0
         if packet_number == next_ack:
             ack = 1
-            ack_gap += 1
-            next_ack += ack_gap
         data_packet = packets.DataPacket(
             connection_id, total_bytes, packet_number, ack, read_data)
+        if args.verbose: print(data_packet.header_as_string())
         sock.sendto(data_packet.as_bytes(), addr)
         # Receive an ACK from the receiver
         if ack:
-            #print("acking packet %d" % packet_number)
-            recv_data, addr = sock.recvfrom(packets.ACKPacket.get_size())
-            ack_packet = packets.ACKPacket.parse_bytes(recv_data)
-            # Check if we got an ACK
-            if ack_packet.get_number() != data_packet.get_number():
-                print("Failed to ACK")
-                break
+            if args.verbose: print("ACKING PACKET %d" % packet_number)
+            try:
+                recv_data, addr = sock.recvfrom(packets.ACKPacket.get_size())
+                ack_packet = packets.ACKPacket.parse_bytes(recv_data)
+                if packet_number == ack_packet.get_number():
+                    if args.verbose: print("ACK SUCCESSFUL")
+                    last_successful = packet_number
+                    ack_gap += 1
+                    next_ack += ack_gap
+                    if args.verbose: print("Next ACK: %d"%next_ack)
+                else:
+                    if args.verbose: print("ACK RECIEVED FOR PACKET: %d"%ack_packet.get_number())
+            except socket.timeout:
+                if args.verbose: print("FAILED ACK")
+                packet_number = last_successful + 1
+                f.seek(packet_number * packets.DataPacket.DATA_SIZE)
+                ack_gap = 0
+                next_ack = packet_number
+                continue
+
         if not read_data:  # EOF
+            if args.verbose: print("end of file")
             break
         packet_number += 1
+        #if packet_number == next_ack:
+
 
     f.close()

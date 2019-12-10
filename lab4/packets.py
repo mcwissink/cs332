@@ -40,6 +40,9 @@ class DataPacket:
 
     def get_data(self):
         return self._data
+    
+    def header_as_string(self):
+        return "connection_id: %d, total_bytes: %d, packet_number: %d, ack: %d"%(self.get_connection_id(), self.get_total_bytes(), self.get_number(), self.get_ack())
 
     @staticmethod
     def parse_bytes(packet):
