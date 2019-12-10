@@ -41,7 +41,7 @@ with open(args.out, 'wb') as f:
                 if args.verbose: print("ACKING PACKET %d" % data_packet.get_number())
                 ack_packet = packets.ACKPacket(data_packet.get_connection_id(), data_packet.get_number())
                 sock.sendto(ack_packet.as_bytes(), addr)
-            if not data_packet.get_data(): # EOF
+            if not data_packet.get_data() and data_packet.get_number() <= packet_number: # EOF
                 break
             # Write the data to the file
             if data_packet.get_number() == packet_number:
