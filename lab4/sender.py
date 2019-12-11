@@ -49,7 +49,7 @@ with open(args.filename, 'rb') as f:
             if args.verbose: print("end of file")
             break
 
-        last_packet = len(read_data) * packet_number >= total_bytes
+        last_packet = packets.DataPacket.DATA_SIZE * (packet_number + 1) >= total_bytes
         ack = 1 if packet_number == next_ack or last_packet else 0
 
         data_packet = packets.DataPacket(connection_id, total_bytes, packet_number, ack, read_data)
