@@ -45,18 +45,24 @@ with open(args.filename, 'rb') as f:
     while True:
         # Send the data we read from the file
         read_data = f.read(packets.DataPacket.DATA_SIZE)
-        ack = 1 if packet_number == next_ack else 0
+        if not read_data:  # EOF
+            if args.verbose: print("end of file")
+            break
 
-        data_packet = packets.DataPacket(
-            connection_id, total_bytes, packet_number, ack, read_data)
+        last_packet = len(read_data) * packet_number >= total_bytes
+        ack = 1 if packet_number == next_ack or last_packet else 0
+
+        data_packet = packets.DataPacket(connection_id, total_bytes, packet_number, ack, read_data)
+
         if args.verbose:
             print(data_packet.header_as_string())
+
         sock.sendto(data_packet.as_bytes(), addr)  # send the packet
         # Receive an ACK from the receiver
         if data_packet.get_ack():
             if args.verbose:
                 print("ACKING PACKET %d" % packet_number)
-                if not data_packet.get_data():
+                if last_packet:
                     print("LAST PACKET")
             try:
                 success = False
@@ -78,8 +84,8 @@ with open(args.filename, 'rb') as f:
                             print("ACK RECIEVED FOR PACKET: %d WITH CONNECTION ID: %d" % (
                                 ack_packet.get_number(), ack_packet.get_connection_id()))
             except socket.timeout:  # ACK Failed
-                if not data_packet.get_data() or final_attempts != 0: # if final packet has been sent
-                    if not data_packet.get_data(): # incremement each time final packet is sent
+                if last_packet or final_attempts != 0: # if final packet has been sent
+                    if last_packet: # incremement each time final packet is sent
                         final_attempts += 1
                         if args.verbose:
                             print("Failed to ack final packet %d times" %
@@ -98,10 +104,6 @@ with open(args.filename, 'rb') as f:
 
                 continue
 
-        if not read_data:  # EOF
-            if args.verbose:
-                print("end of file")
-            break
         packet_number += 1
 
     f.close()

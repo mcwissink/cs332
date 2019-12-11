@@ -25,6 +25,7 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind((address, args.port))
 print("Listening on port %s:%s" % (address, args.port))
 connection_id = 0
+total_bytes = 0
 packet_number = 0
 
 with open(args.out, 'wb') as f:
@@ -34,6 +35,8 @@ with open(args.out, 'wb') as f:
         data_packet = packets.DataPacket.parse_bytes(data)
         if connection_id == 0 and data_packet.get_number() == 0: # Set the connection ID
             connection_id = data_packet.get_connection_id()
+            total_bytes = data_packet.get_total_bytes()
+
         if args.verbose: print(data_packet.header_as_string())
         if connection_id == data_packet.get_connection_id(): # Ignore packets not matching connection ID
             # Send an ACK
@@ -41,13 +44,16 @@ with open(args.out, 'wb') as f:
                 if args.verbose: print("ACKING PACKET %d" % data_packet.get_number())
                 ack_packet = packets.ACKPacket(data_packet.get_connection_id(), data_packet.get_number())
                 sock.sendto(ack_packet.as_bytes(), addr)
-            if not data_packet.get_data() and data_packet.get_number() <= packet_number: # EOF
-                break
             # Write the data to the file
             if data_packet.get_number() == packet_number:
                 if args.verbose: print("RECIEVED PACKET %d"%data_packet.get_number())
                 f.write(data_packet.get_data())
+                total_bytes -= len(data_packet.get_data())
+                if total_bytes <= 0:
+                    print("DONE")
+                    break
                 packet_number += 1
             else:
                 if args.verbose: print("waiting for packet_number %d received number %d"%(packet_number, data_packet.get_number()))
+            # Check if we have received the whole file
     f.close()
